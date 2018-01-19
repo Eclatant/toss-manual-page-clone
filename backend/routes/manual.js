@@ -10,7 +10,9 @@ router.get("/", (req, res) => {
 
 router.post("/", ({ body }, res) => {
   console.log(JSON.stringify(body, null, 2));
-  res.json({ complete: true });
+  ({ title, content } = body);
+  const manual = Manual({ title, content });
+  manual.save(error => res.json(error ? error : { complete: true }));
 });
 
 module.exports = router;
