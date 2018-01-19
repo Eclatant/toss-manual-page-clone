@@ -6,13 +6,7 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <Layout>
-          {this.props.data.map(v => (
-            <p>
-              {v.title} {v.content}
-            </p>
-          ))}
-        </Layout>
+        <Layout>{this.props.data.map(v => <p>{v.value}</p>)}</Layout>
       </div>
     );
   }

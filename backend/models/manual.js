@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const manualSchema = new mongoose.Schema({
-  title: String,
-  content: String
+  value: String
 });
 
 manualSchema.plugin(AutoIncrement, { inc_field: "id" });

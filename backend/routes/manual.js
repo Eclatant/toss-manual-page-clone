@@ -10,15 +10,15 @@ router.get("/", (req, res) => {
 
 router.post("/", ({ body }, res) => {
   console.log(JSON.stringify(body, null, 2));
-  ({ title, content } = body);
-  const manual = Manual({ title, content });
+  ({ value } = body);
+  const manual = Manual({ value });
   manual.save(error => res.json(error ? error : { complete: true }));
 });
 
 router.put("/:contentId", ({ body, params }, res) => {
   Manual.findOneAndUpdate(
     { id: params.contentId },
-    { title: body.title, content: body.content },
+    { value: body.value },
     {},
     (error, manual) => {
       if (error) {
