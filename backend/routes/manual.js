@@ -15,4 +15,32 @@ router.post("/", ({ body }, res) => {
   manual.save(error => res.json(error ? error : { complete: true }));
 });
 
+router.put("/:contentId", ({ body, params }, res) => {
+  Manual.findOneAndUpdate(
+    { id: params.contentId },
+    { title: body.title, content: body.content },
+    {},
+    (error, manual) => {
+      if (error) {
+        console.error(`database failure ${error}`);
+        return res.status(500).json({ complete: false });
+      }
+
+      if (!manual) {
+        console.error(`manual not found`);
+        return res.status(404).json({ complete: false });
+      }
+
+      manual.save(error => {
+        if (error) {
+          console.error(`Document Create Error ${error}`);
+          res.status(416).json({ complete: false });
+        } else {
+          res.status(200).json({ complete: true });
+        }
+      });
+    }
+  );
+});
+
 module.exports = router;
