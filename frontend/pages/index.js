@@ -3,12 +3,12 @@ import Head from "next/head";
 
 import "isomorphic-unfetch";
 
+import config from "../config";
+
 export default class Index extends React.Component {
   static async getInitialProps() {
-    const { stargazers_count: stars } = await fetch(
-      "https://api.github.com/repos/zeit/next.js"
-    ).then(v => v.json());
-    return { stars };
+    const data = await fetch(config.MANUAL_API).then(v => v.json());
+    return { data };
   }
 
   render() {
@@ -21,7 +21,11 @@ export default class Index extends React.Component {
           />
           <title>토스 결제 시작하기</title>
         </Head>
-        <p>Next.js has {this.props.stars} ⭐️</p>
+        {this.props.data.manuals.map(v => (
+          <p>
+            {v.title} {v.content}
+          </p>
+        ))}
       </div>
     );
   }
