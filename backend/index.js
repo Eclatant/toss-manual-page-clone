@@ -3,9 +3,12 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 
 const { port } = require("./config");
+const db = require("./config/db");
 const manual = require("./routes/manual");
 
 const app = express();
+
+db();
 
 app.use(morgan("dev"));
 app.use(bodyParser.json());
