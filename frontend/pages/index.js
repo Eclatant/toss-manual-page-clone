@@ -9,13 +9,13 @@ import config from "../config";
 export default class Index extends React.Component {
   static async getInitialProps() {
     const { manuals } = await fetch(config.MANUAL_API).then(v => v.json());
-    return { manuals };
+    return { manuals: manuals.map(v => ({ ...v, context: false })) };
   }
 
   render() {
     return (
       <div>
-        <App data={this.props.manuals} />
+        <App manuals={this.props.manuals} />
       </div>
     );
   }
