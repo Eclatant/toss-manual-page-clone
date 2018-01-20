@@ -6,4 +6,5 @@ const manualSchema = new mongoose.Schema({
 });
 
 manualSchema.plugin(AutoIncrement, { inc_field: "id" });
+
 module.exports = mongoose.model("Manual", manualSchema);
