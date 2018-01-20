@@ -5,7 +5,7 @@ const readline = require("readline");
 const { dbUri } = require("./index");
 const Manual = require("../models/manual");
 
-let seed = null;
+const seed = [];
 
 fs.readdir(`seed`, async (err, files) => {
   const readFile = file =>
@@ -24,11 +24,22 @@ fs.readdir(`seed`, async (err, files) => {
         });
     });
 
-  const promises = files.map(f => readFile(f));
+  files.forEach((f, i) =>
+    readFile(f).then(value => seed.push({ value, order: i + 1 }))
+  );
 
-  seed = await Promise.all(promises)
-    .then(data => data.map(value => ({ value })))
-    .catch(console.error);
+  // const promises = files.map(f => readFile(f));
+
+  // seed = promises
+  //   .reduce((prev, value) => {
+  //     value.then(v => prev.push(value)).catch(console.error);
+  //     return prev;
+  //   }, [])
+  //   .map(value => ({ value }));
+
+  // seed = await Promise.all(promises)
+  //   .then(data => data.map(value => ({ value })))
+  //   .catch(console.error);
 });
 
 module.exports = () => {
@@ -58,7 +69,6 @@ module.exports = () => {
       Manual.counterReset("id", error => {
         if (error) console.error(`countRest Error ${error}`);
 
-        console.log(seed);
         for (s of seed) {
           Manual(s).save(error => {
             if (error) console.error(`Document Create Error ${error}`);
