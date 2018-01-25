@@ -1,19 +1,17 @@
-import React from "react";
-
-import "isomorphic-unfetch";
+import React, { Component } from "react";
 
 import App from "../components/App";
 
+import fetcher from "../utils/fetcher";
 import config from "../config";
 
-export default class Index extends React.Component {
-  static async getInitialProps() {
-    const { manuals } = await fetch(config.MANUAL_API).then(v => v.json());
-    return {
+export default class Index extends Component {
+  static getInitialProps() {
+    return fetcher("GET").then(({ manuals }) => ({
       manuals: manuals
         .map(v => ({ ...v, context: false }))
         .sort(({ order: order1 }, { order: order2 }) => order1 - order2)
-    };
+    }));
   }
 
   render() {

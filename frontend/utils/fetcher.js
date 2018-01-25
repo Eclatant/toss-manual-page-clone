@@ -18,7 +18,7 @@ export default (method, url = "", payload) => {
     .then(rawResponse => rawResponse.json())
     .then(response => {
       if (response.errors) throw new Error(response.errors[0].message);
-      return console.log(response), response;
+      return response;
     })
     .catch(error => {
       throw error;
