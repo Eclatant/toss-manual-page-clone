@@ -26,11 +26,13 @@ fs.readdir(`seed`, (error, files) => {
         });
     });
 
-  files.forEach((f, i) =>
+  files.forEach((f, i) => {
     readFile(f)
-      .then(value => seed.push({ value, order: i + 1 }))
-      .catch(console.error)
-  );
+      .then(value =>
+        seed.push({ value, order: f.substring(0, f.indexOf(".")) })
+      )
+      .catch(console.error);
+  });
 });
 
 module.exports = () => {
