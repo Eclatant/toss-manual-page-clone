@@ -8,25 +8,18 @@ router.get("/", (req, res) =>
   Manual.find({}, (error, manuals) => res.json(error ? error : { manuals }))
 );
 
-router.post("/", ({ body, body: { value } }, res) => {
+router.post("/", ({ body, body: { value, order } }, res) => {
   console.log(JSON.stringify(body, null, 2));
 
-  Manual.count({}, (error, order) => {
+  const m = Manual({ value, order });
+
+  m.save(error => {
     if (error) {
-      console.error(`Collection Count Error ${error}`);
-      return res.status(500).json({ complete: false });
+      console.error(`Document Create Error ${error}`);
+      return res.status(416).json({ complete: false });
     }
 
-    const m = Manual({ value, order });
-
-    m.save(error => {
-      if (error) {
-        console.error(`Document Create Error ${error}`);
-        return res.status(416).json({ complete: false });
-      }
-
-      return res.status(200).json({ complete: true });
-    });
+    return res.status(200).json({ complete: true });
   });
 });
 
