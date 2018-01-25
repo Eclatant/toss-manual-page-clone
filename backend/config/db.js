@@ -7,7 +7,9 @@ const Manual = require("../models/manual");
 
 const seed = [];
 
-fs.readdir(`seed`, async (err, files) => {
+fs.readdir(`seed`, (error, files) => {
+  if (error) return console.error(error);
+
   const readFile = file =>
     new Promise((resolve, reject) => {
       const rl = readline.createInterface({
@@ -25,21 +27,10 @@ fs.readdir(`seed`, async (err, files) => {
     });
 
   files.forEach((f, i) =>
-    readFile(f).then(value => seed.push({ value, order: i + 1 }))
+    readFile(f)
+      .then(value => seed.push({ value, order: i + 1 }))
+      .catch(console.error)
   );
-
-  // const promises = files.map(f => readFile(f));
-
-  // seed = promises
-  //   .reduce((prev, value) => {
-  //     value.then(v => prev.push(value)).catch(console.error);
-  //     return prev;
-  //   }, [])
-  //   .map(value => ({ value }));
-
-  // seed = await Promise.all(promises)
-  //   .then(data => data.map(value => ({ value })))
-  //   .catch(console.error);
 });
 
 module.exports = () => {
