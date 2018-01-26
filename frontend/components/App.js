@@ -1,3 +1,4 @@
+import _ from "partial-js";
 import React, { Component } from "react";
 import produce from "immer";
 
@@ -11,7 +12,7 @@ export default class App extends Component {
   state = {
     manuals: this.props.manuals,
     sideItem: [],
-    titleId: []
+    h3Id: []
   };
 
   componentDidMount() {
@@ -21,14 +22,18 @@ export default class App extends Component {
   bindAppEl = el => (this.appEl = el);
 
   crawlingHeading = () => {
+    const h3Elements = this.appEl.querySelectorAll("h3");
+
     this.setState({
-      titleId: Array.from(this.appEl.querySelectorAll("h3")).map(v => v.id),
-      sideItem: Array.from(this.appEl.querySelectorAll("h3")).reduce(
-        (prev, v) =>
+      h3Id: _.map(h3Elements, ({ id }) => id),
+      sideItem: _.reduce(
+        h3Elements,
+        (prev, value) =>
           prev.concat({
-            [v.textContent]: Array.from(
-              v.parentElement.querySelectorAll("h4")
-            ).map(v => v.textContent)
+            [value.textContent]: _.map(
+              value.parentElement.querySelectorAll("h4"),
+              ({ textContent }) => textContent
+            )
           }),
         []
       )
@@ -36,7 +41,7 @@ export default class App extends Component {
   };
 
   handleTextAreaSize = () => {
-    Array.from(this.appEl.querySelectorAll("textarea")).map(v => {
+    _.each(this.appEl.querySelectorAll("textarea"), v => {
       v.style.height = `${v.scrollHeight}px`;
     });
   };
@@ -53,7 +58,7 @@ export default class App extends Component {
   };
 
   handleCreate = ({ target }) => {
-    const [index, value] = [target.name, target.value].map(Number);
+    const [index, value] = _.map([target.name, target.value], Number);
     const manuals = produce(this.state.manuals, draftManuals => {
       draftManuals.splice(index + 1, 0, {
         context: true,
@@ -78,7 +83,7 @@ export default class App extends Component {
 
   handleRemove = ({ target }) => {
     const { manuals } = this.state;
-    const [index, order] = [target.name, target.value].map(Number);
+    const [index, order] = _.map([target.name, target.value], Number);
 
     fetcher("DELETE", order);
     this.setState(
@@ -92,7 +97,7 @@ export default class App extends Component {
   };
 
   handleSave = ({ target }) => {
-    const [index, order] = [target.name, target.value].map(Number);
+    const [index, order] = _.map([target.name, target.value], Number);
     const { manuals: storeManuals } = this.state;
     const { create, value } = storeManuals[index];
     let manuals;
@@ -116,7 +121,7 @@ export default class App extends Component {
   };
 
   render() {
-    const { manuals, sideItem, titleId } = this.state;
+    const { manuals, sideItem, h3Id } = this.state;
 
     const sideNavStyle = {
       width: 250
@@ -184,7 +189,7 @@ export default class App extends Component {
         <Layout>
           <div className="app">
             {this.state.sideItem.length > 0 ? (
-              <Side titleId={titleId} sideItem={sideItem} />
+              <Side h3Id={h3Id} sideItem={sideItem} />
             ) : null}
 
             <div className="container" ref={this.bindAppEl}>

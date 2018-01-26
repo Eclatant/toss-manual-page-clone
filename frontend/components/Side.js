@@ -7,7 +7,7 @@ class Side extends Component {
     super(props);
 
     this.state = {
-      openKeys: [this.props.titleId[0]]
+      openKeys: [this.props.h3Id[0]]
     };
   }
 
@@ -15,7 +15,7 @@ class Side extends Component {
     const latestOpenKey = openKeys.find(
       key => this.state.openKeys.indexOf(key) === -1
     );
-    if (this.props.titleId.indexOf(latestOpenKey) === -1) {
+    if (this.props.h3Id.indexOf(latestOpenKey) === -1) {
       this.setState({ openKeys });
     } else {
       window.location.href = `${window.location.origin}/#${latestOpenKey}`;
@@ -69,7 +69,7 @@ class Side extends Component {
         >
           {this.props.sideItem.map((v, i) => (
             <SubMenu
-              key={this.props.titleId[i]}
+              key={this.props.h3Id[i]}
               title={
                 <span>
                   <span>{Object.keys(v)[0]}</span>
