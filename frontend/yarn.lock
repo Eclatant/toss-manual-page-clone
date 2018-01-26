@@ -3726,6 +3726,10 @@ parse-json@^2.2.0:
   dependencies:
     error-ex "^1.2.0"
 
+partial-js@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/partial-js/-/partial-js-1.1.2.tgz#2f5dbb65cb7f8a2d956fcd20313b15f369214f59"
+
 path-browserify@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/path-browserify/-/path-browserify-0.0.0.tgz#a0b870729aae214005b7d5032ec2cbbb0fb4451a"
