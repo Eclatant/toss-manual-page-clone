@@ -1,3 +1,4 @@
+import _ from "partial-js";
 import React, { Component } from "react";
 
 import App from "../components/App";
@@ -8,9 +9,10 @@ import config from "../config";
 export default class Index extends Component {
   static getInitialProps() {
     return fetcher("GET").then(({ manuals }) => ({
-      manuals: manuals
-        .map(v => ({ ...v, context: false }))
-        .sort(({ order: order1 }, { order: order2 }) => order1 - order2)
+      manuals: _.sortBy(
+        _.map(manuals, v => ({ ...v, context: false })),
+        "order"
+      )
     }));
   }
 
