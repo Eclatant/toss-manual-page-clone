@@ -1,14 +1,36 @@
 import React, { Component } from "react";
 import produce from "immer";
-import Markdown from "react-mark";
 
 import Layout from "./Layout";
+import Side from "./Side";
+import Content from "./Content";
 
 import fetcher from "../utils/fetcher";
 
 export default class App extends Component {
   state = {
-    manuals: this.props.manuals
+    manuals: this.props.manuals,
+    title: []
+  };
+
+  componentDidMount() {
+    this.crawlingHeading();
+  }
+
+  bindAppEl = el => (this.appEl = el);
+
+  crawlingHeading = () => {
+    this.setState({
+      title: Array.from(this.appEl.querySelectorAll("h3")).reduce(
+        (prev, v) =>
+          prev.concat({
+            [v.textContent]: Array.from(
+              v.parentElement.querySelectorAll("h4")
+            ).map(v => v.textContent)
+          }),
+        []
+      )
+    });
   };
 
   handleChange = ({ target }) => {
@@ -33,7 +55,7 @@ export default class App extends Component {
       });
     });
 
-    this.setState(state => ({ manuals }));
+    this.setState({ manuals }, this.crawlingHeading);
   };
 
   handleEdit = ({ target }) => {
@@ -43,14 +65,13 @@ export default class App extends Component {
       draftManuals[index].context = true;
     });
 
-    this.setState(
-      state => ({ manuals }),
-      () => {
-        const textArea =
-          target.parentElement.nextElementSibling.firstElementChild;
-        textArea.style.height = `${textArea.scrollHeight}px`;
-      }
-    );
+    this.setState({ manuals }, this.handleTextAreaSize);
+  };
+
+  handleTextAreaSize = () => {
+    this.appEl.querySelector("textarea").style.height = `${
+      this.appEl.querySelector("textarea").scrollHeight
+    }px`;
   };
 
   handleRemove = ({ target }) => {
@@ -58,11 +79,14 @@ export default class App extends Component {
     const [index, order] = [target.name, target.value].map(Number);
 
     fetcher("DELETE", order);
-    this.setState({
-      manuals: produce(manuals, draftManuals => {
-        draftManuals.splice(index, 1);
-      })
-    });
+    this.setState(
+      {
+        manuals: produce(manuals, draftManuals => {
+          draftManuals.splice(index, 1);
+        })
+      },
+      this.crawlingHeading
+    );
   };
 
   handleSave = ({ target }) => {
@@ -86,83 +110,26 @@ export default class App extends Component {
       });
     }
 
-    this.setState(state => ({ manuals }));
+    this.setState({ manuals }, this.crawlingHeading);
   };
 
   render() {
-    const { manuals } = this.state;
+    const { manuals, title } = this.state;
 
     return (
       <div>
         <Layout>
-          <div className="wrapper">
-            <div className="side">
-              <a href="#">
-                <img
-                  className="logo"
-                  src="http://tossdev.github.io/images/logo_tossdev.png"
-                  alt="logo"
-                />
-              </a>
-              <h1>
-                <a href="#">토스 결제 시작하기</a>
-              </h1>
-              <ul />
-            </div>
-            <div className="content">
-              <style jsx>
-                {`
-                  textarea {
-                    width: 1200px;
-                    font-size: 16px;
-                  }
-                `}
-              </style>
-              {manuals.map(({ value, order }, i) => (
-                <div key={order}>
-                  <div className="button-group">
-                    <button
-                      key="create"
-                      value={order}
-                      name={i}
-                      onClick={this.handleCreate}
-                    >
-                      생성
-                    </button>
-                    <button
-                      key="edit"
-                      value={order}
-                      name={i}
-                      onClick={
-                        manuals[i].context ? this.handleSave : this.handleEdit
-                      }
-                    >
-                      {manuals[i].context ? "저장" : "수정"}
-                    </button>
-                    <button
-                      key="remove"
-                      value={order}
-                      name={i}
-                      onClick={this.handleRemove}
-                    >
-                      삭제
-                    </button>
-                  </div>
-                  <div className="content" id={order}>
-                    {manuals[i].context ? (
-                      <textarea
-                        name={i}
-                        onChange={this.handleChange}
-                        placeholder="마크다운으로 콘텐츠를 입력해주세요."
-                        value={value}
-                      />
-                    ) : (
-                      <Markdown>{value}</Markdown>
-                    )}
-                  </div>
-                  <hr />
-                </div>
-              ))}
+          <div>
+            <Side title={title} />
+            <div className="content" ref={this.bindAppEl}>
+              <Content
+                manuals={manuals}
+                handleCreate={this.handleCreate}
+                handleChange={this.handleChange}
+                handleEdit={this.handleEdit}
+                handleRemove={this.handleRemove}
+                handleSave={this.handleSave}
+              />
             </div>
           </div>
         </Layout>
