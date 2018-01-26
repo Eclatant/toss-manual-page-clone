@@ -8,7 +8,7 @@ class Side extends Component {
     super(props);
 
     this.state = {
-      openKeys: [this.props.h3Id[0]]
+      openKeys: []
     };
   }
 

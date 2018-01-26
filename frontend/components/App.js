@@ -180,9 +180,7 @@ export default class App extends Component {
       <div>
         <Layout>
           <div className="app">
-            {this.state.sideItem.length > 0 ? (
-              <Side h3Id={h3Id} sideItem={sideItem} />
-            ) : null}
+            <Side h3Id={h3Id} sideItem={sideItem} />
 
             <div className="container" ref={this.bindAppEl}>
               <Content
