@@ -10,7 +10,8 @@ import fetcher from "../utils/fetcher";
 export default class App extends Component {
   state = {
     manuals: this.props.manuals,
-    title: []
+    sideItem: [],
+    titleId: []
   };
 
   componentDidMount() {
@@ -21,7 +22,8 @@ export default class App extends Component {
 
   crawlingHeading = () => {
     this.setState({
-      title: Array.from(this.appEl.querySelectorAll("h3")).reduce(
+      titleId: Array.from(this.appEl.querySelectorAll("h3")).map(v => v.id),
+      sideItem: Array.from(this.appEl.querySelectorAll("h3")).reduce(
         (prev, v) =>
           prev.concat({
             [v.textContent]: Array.from(
@@ -30,6 +32,12 @@ export default class App extends Component {
           }),
         []
       )
+    });
+  };
+
+  handleTextAreaSize = () => {
+    Array.from(this.appEl.querySelectorAll("textarea")).map(v => {
+      v.style.height = `${v.scrollHeight}px`;
     });
   };
 
@@ -66,12 +74,6 @@ export default class App extends Component {
     });
 
     this.setState({ manuals }, this.handleTextAreaSize);
-  };
-
-  handleTextAreaSize = () => {
-    this.appEl.querySelector("textarea").style.height = `${
-      this.appEl.querySelector("textarea").scrollHeight
-    }px`;
   };
 
   handleRemove = ({ target }) => {
@@ -114,7 +116,7 @@ export default class App extends Component {
   };
 
   render() {
-    const { manuals, title } = this.state;
+    const { manuals, sideItem, titleId } = this.state;
 
     const sideNavStyle = {
       width: 250
@@ -134,18 +136,18 @@ export default class App extends Component {
         }
 
         .side {
-          position: fixed;
+          border-right: 1px solid #ddd;
+          height: 100vh;
           left: 0;
+          overflow-y: scroll;
+          position: fixed;
           top: 0;
           width: ${sideNavStyle.width}px;
-          height: 100vh;
-          overflow-y: scroll;
-          border-right: 1px solid #ddd;
         }
 
         .side a {
-          text-decoration: none;
           color: inherit;
+          text-decoration: none;
         }
 
         .side a:hover {
@@ -153,19 +155,19 @@ export default class App extends Component {
         }
 
         .side ul {
-          list-style: none;
           border-bottom: none;
+          list-style: none;
         }
 
         .container {
           float: right;
+          padding-bottom: ${containerStyle.paddingBottom}px;
+          padding-right: ${containerStyle.paddingRight}px;
+          padding-top: ${containerStyle.paddingTop}px;
           width: calc(
             100% - ${sideNavStyle.width}px - ${containerStyle.marginLeft}px -
               ${containerStyle.paddingRight}px
           );
-          padding-right: ${containerStyle.paddingRight}px;
-          padding-top: ${containerStyle.paddingTop}px;
-          padding-bottom: ${containerStyle.paddingBottom}px;
         }
 
         .clear:before,
@@ -181,7 +183,9 @@ export default class App extends Component {
       <div>
         <Layout>
           <div className="app">
-            <Side title={title} />
+            {this.state.sideItem.length > 0 ? (
+              <Side titleId={titleId} sideItem={sideItem} />
+            ) : null}
 
             <div className="container" ref={this.bindAppEl}>
               <Content
