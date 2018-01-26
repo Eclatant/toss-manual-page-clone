@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import produce from "immer";
 import Markdown from "react-mark";
 
 import Layout from "./Layout";
@@ -10,94 +11,80 @@ export default class App extends Component {
     manuals: this.props.manuals
   };
 
-  manualsGenerator = (newManual, index) => [
-    ...this.state.manuals.slice(0, index),
-    newManual,
-    ...this.state.manuals.slice(index + 1)
-  ];
-
   handleChange = ({ target }) => {
     const { manuals } = this.state;
     const { name, value } = target;
-    const index = parseInt(name);
 
-    this.setState(state => ({
-      manuals: this.manualsGenerator(
-        {
-          ...manuals[index],
-          value
-        },
-        index
-      )
-    }));
-  };
-
-  handleRemove = ({ target }) => {
-    const index = parseInt(target.name);
-    const manuals = [
-      ...this.state.manuals.slice(0, index),
-      ...this.state.manuals.slice(index + 1)
-    ];
-
-    fetcher("DELETE", `${target.value}`);
-    this.setState(state => ({ manuals }));
-  };
-
-  handleClick = ({ target }) => {
-    const index = parseInt(target.name);
-    let manual = this.state.manuals[index];
-    const { context, create, value } = manual;
-    let manuals;
-
-    if (target.textContent === "수정") {
-      manuals = this.manualsGenerator(
-        {
-          ...manual,
-          context: !context
-        },
-        index
-      );
-
-      this.setState(
-        state => ({ manuals }),
-        () => {
-          const textArea =
-            target.parentElement.nextElementSibling.firstElementChild;
-
-          textArea.style.height = `${textArea.scrollHeight}px`;
-        }
-      );
-    } else if (target.textContent === "저장") {
-      if (create) {
-        fetcher("POST", undefined, { value, order: target.value });
-        manuals = this.manualsGenerator(
-          { ...manual, value, context: false, order: target.value },
-          index
-        );
-      } else {
-        fetcher("PUT", `${target.value}`, { value });
-        manuals = this.manualsGenerator(
-          { ...manual, value, context: false },
-          index
-        );
-      }
-
-      this.setState(state => ({ manuals }));
-    }
+    this.setState({
+      manuals: produce(manuals, draftManuals => {
+        draftManuals[name].value = value;
+      })
+    });
   };
 
   handleCreate = ({ target }) => {
-    const index = parseInt(target.name);
-    const manuals = [
-      ...this.state.manuals.slice(0, index + 1),
-      {
-        value: "",
+    const [index, value] = [target.name, target.value].map(Number);
+    const manuals = produce(this.state.manuals, draftManuals => {
+      draftManuals.splice(index + 1, 0, {
         context: true,
         create: true,
-        order: parseInt(target.value) + 1
-      },
-      ...this.state.manuals.slice(index + 1)
-    ];
+        order: value + 1,
+        value: ""
+      });
+    });
+
+    this.setState(state => ({ manuals }));
+  };
+
+  handleEdit = ({ target }) => {
+    const index = Number(target.name);
+    const { manuals: storeManuals } = this.state;
+    const manuals = produce(storeManuals, draftManuals => {
+      draftManuals[index].context = true;
+    });
+
+    this.setState(
+      state => ({ manuals }),
+      () => {
+        const textArea =
+          target.parentElement.nextElementSibling.firstElementChild;
+        textArea.style.height = `${textArea.scrollHeight}px`;
+      }
+    );
+  };
+
+  handleRemove = ({ target }) => {
+    const { manuals } = this.state;
+    const [index, order] = [target.name, target.value].map(Number);
+
+    fetcher("DELETE", order);
+    this.setState({
+      manuals: produce(manuals, draftManuals => {
+        draftManuals.splice(index, 1);
+      })
+    });
+  };
+
+  handleSave = ({ target }) => {
+    const [index, order] = [target.name, target.value].map(Number);
+    const { manuals: storeManuals } = this.state;
+    const { create, value } = storeManuals[index];
+    let manuals;
+
+    if (create) {
+      fetcher("POST", undefined, { value, order });
+      manuals = produce(storeManuals, draftManuals => {
+        draftManuals[index].context = false;
+        draftManuals[index].order = order;
+        draftManuals[index].value = value;
+      });
+    } else {
+      fetcher("PUT", order, { value });
+      manuals = produce(storeManuals, draftManuals => {
+        draftManuals[index].context = false;
+        draftManuals[index].value = value;
+      });
+    }
 
     this.setState(state => ({ manuals }));
   };
@@ -146,7 +133,9 @@ export default class App extends Component {
                       key="edit"
                       value={order}
                       name={i}
-                      onClick={this.handleClick}
+                      onClick={
+                        manuals[i].context ? this.handleSave : this.handleEdit
+                      }
                     >
                       {manuals[i].context ? "저장" : "수정"}
                     </button>
