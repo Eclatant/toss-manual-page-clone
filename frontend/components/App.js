@@ -8,6 +8,8 @@ import Content from "./Content";
 
 import fetcher from "../utils/fetcher";
 
+import style from "../config/style";
+
 export default class App extends Component {
   state = {
     manuals: this.props.manuals,
@@ -123,17 +125,6 @@ export default class App extends Component {
   render() {
     const { manuals, sideItem, h3Id } = this.state;
 
-    const sideNavStyle = {
-      width: 250
-    };
-
-    const containerStyle = {
-      marginLeft: 50,
-      paddingRight: 100,
-      paddingTop: 100,
-      paddingBottom: 100
-    };
-
     return [
       <style jsx>{`
         .app {
@@ -147,7 +138,7 @@ export default class App extends Component {
           overflow-y: scroll;
           position: fixed;
           top: 0;
-          width: ${sideNavStyle.width}px;
+          width: ${style.sideNavStyle.width}px;
         }
 
         .side a {
@@ -166,12 +157,13 @@ export default class App extends Component {
 
         .container {
           float: right;
-          padding-bottom: ${containerStyle.paddingBottom}px;
-          padding-right: ${containerStyle.paddingRight}px;
-          padding-top: ${containerStyle.paddingTop}px;
+          padding-bottom: ${style.containerStyle.paddingBottom}px;
+          padding-right: ${style.containerStyle.paddingRight}px;
+          padding-top: ${style.containerStyle.paddingTop}px;
           width: calc(
-            100% - ${sideNavStyle.width}px - ${containerStyle.marginLeft}px -
-              ${containerStyle.paddingRight}px
+            100% - ${style.sideNavStyle.width}px -
+              ${style.containerStyle.marginLeft}px -
+              ${style.containerStyle.paddingRight}px
           );
         }
 
