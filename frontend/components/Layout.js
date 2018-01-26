@@ -10,6 +10,11 @@ const Layout = ({ children }) => (
         rel="stylesheet"
         type="text/css"
       />
+      <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.1.4/antd.min.css"
+        rel="stylesheet"
+        type="text/css"
+      />
     </Head>
     {children}
   </div>
