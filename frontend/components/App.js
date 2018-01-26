@@ -116,12 +116,74 @@ export default class App extends Component {
   render() {
     const { manuals, title } = this.state;
 
-    return (
+    const sideNavStyle = {
+      width: 250
+    };
+
+    const containerStyle = {
+      marginLeft: 50,
+      paddingRight: 100,
+      paddingTop: 100,
+      paddingBottom: 100
+    };
+
+    return [
+      <style jsx>{`
+        .app {
+          position: relative;
+        }
+
+        .side {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: ${sideNavStyle.width}px;
+          height: 100vh;
+          overflow-y: scroll;
+          border-right: 1px solid #ddd;
+        }
+
+        .side a {
+          text-decoration: none;
+          color: inherit;
+        }
+
+        .side a:hover {
+          text-decoration: underline;
+        }
+
+        .side ul {
+          list-style: none;
+          border-bottom: none;
+        }
+
+        .container {
+          float: right;
+          width: calc(
+            100% - ${sideNavStyle.width}px - ${containerStyle.marginLeft}px -
+              ${containerStyle.paddingRight}px
+          );
+          padding-right: ${containerStyle.paddingRight}px;
+          padding-top: ${containerStyle.paddingTop}px;
+          padding-bottom: ${containerStyle.paddingBottom}px;
+        }
+
+        .clear:before,
+        .clear:after {
+          content: "";
+          display: table;
+        }
+
+        .clear:after {
+          clear: both;
+        }
+      `}</style>,
       <div>
         <Layout>
-          <div>
+          <div className="app">
             <Side title={title} />
-            <div className="content" ref={this.bindAppEl}>
+
+            <div className="container" ref={this.bindAppEl}>
               <Content
                 manuals={manuals}
                 handleCreate={this.handleCreate}
@@ -134,6 +196,6 @@ export default class App extends Component {
           </div>
         </Layout>
       </div>
-    );
+    ];
   }
 }
