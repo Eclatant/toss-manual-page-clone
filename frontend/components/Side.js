@@ -1,3 +1,4 @@
+import _ from "partial-js";
 import React, { Component } from "react";
 import { Menu, Icon } from "antd";
 const SubMenu = Menu.SubMenu;
@@ -26,6 +27,8 @@ class Side extends Component {
   };
 
   render() {
+    const { state: { openKeys }, props: { sideItem, h3Id } } = this;
+
     return [
       <style jsx>{`
         .side > * {
@@ -63,26 +66,30 @@ class Side extends Component {
         </h1>
         <Menu
           mode="inline"
-          openKeys={this.state.openKeys}
+          openKeys={openKeys}
           onOpenChange={this.onOpenChange}
           style={{}}
         >
-          {this.props.sideItem.map((v, i) => (
-            <SubMenu
-              key={this.props.h3Id[i]}
-              title={
-                <span>
-                  <span>{Object.keys(v)[0]}</span>
-                </span>
-              }
-            >
-              {v[Object.keys(v)[0]].map((v, i) => (
-                <Menu.Item key={i}>
-                  <a href={`#${v}`}>{v}</a>
-                </Menu.Item>
-              ))}
-            </SubMenu>
-          ))}
+          {sideItem.map((v, i) => {
+            const h3Key = _.keys(v)[0];
+
+            return (
+              <SubMenu
+                key={h3Id[i]}
+                title={
+                  <span>
+                    <span>{h3Key}</span>
+                  </span>
+                }
+              >
+                {v[h3Key].map((v, i) => (
+                  <Menu.Item key={i}>
+                    <a href={`#${v}`}>{v}</a>
+                  </Menu.Item>
+                ))}
+              </SubMenu>
+            );
+          })}
         </Menu>
       </div>
     ];
