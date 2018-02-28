@@ -9,14 +9,16 @@ const manual = require("./routes/manual");
 
 const app = express();
 
-db();
-
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false })); // https://stackoverflow.com/a/29177740
 app.use(cors());
 app.use("/manual", manual);
 
-app.listen(port, () => {
-  console.log(`Hello, ${process.env.USER}! Server is running on ${port} port!`);
-});
+db().then(() =>
+  app.listen(port, () => {
+    console.log(
+      `Hello, ${process.env.USER}! Server is running on ${port} port!`
+    );
+  })
+);
